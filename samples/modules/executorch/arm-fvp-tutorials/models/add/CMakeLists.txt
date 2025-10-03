@@ -31,8 +31,21 @@ include(${EXECUTORCH_DIR}/tools/cmake/Utils.cmake)
 include(${EXECUTORCH_DIR}/tools/cmake/Codegen.cmake)
     
 set(EXECUTORCH_OPS_LIB selective_portable_ops_lib)
-set(EXECUTORCH_SRCS_FILE "${CMAKE_CURRENT_BINARY_DIR}/modules/executorch/executorch/executorch_srcs.cmake")
-include(${EXECUTORCH_SRCS_FILE})
+#set(EXECUTORCH_SRCS_FILE "${CMAKE_CURRENT_BINARY_DIR}/modules/executorch/executorch/executorch_srcs.cmake")
+#include(${EXECUTORCH_SRCS_FILE})
+file(GLOB_RECURSE _portable_kernels__srcs
+	"${EXECUTORCH_DIR}/kernels/portable/cpu/*.cpp"
+)
+list(FILTER _portable_kernels__srcs EXCLUDE REGEX "test/*.cpp")
+list(FILTER _portable_kernels__srcs EXCLUDE REGEX "codegen")
+list(TRANSFORM _portable_kernels__srcs REPLACE "${EXECUTORCH_DIR}" "" OUTPUT_VARIABLE _portable_kernels__srcs)
+
+file(GLOB_RECURSE _kernels_util_all_deps__srcs
+	"${EXECUTORCH_DIR}/kernels/portable/cpu/util/*.cpp"
+)
+list(FILTER _kernels_util_all_deps__srcs EXCLUDE REGEX "test/*.cpp")
+list(FILTER _kernels_util_all_deps__srcs EXCLUDE REGEX "codegen")
+list(TRANSFORM _kernels_util_all_deps__srcs REPLACE "${EXECUTORCH_DIR}" "" OUTPUT_VARIABLE _kernels_util_all_deps__srcs)
 
 if(DEFINED ET_PTE_FILE_PATH_FOR_SELECTIVE_BUILD)
     gen_selected_ops(
